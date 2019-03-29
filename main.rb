@@ -18,12 +18,22 @@ require 'users_service_services_pb'
 
 
 def main
+  start = Time.now
   user_service = Demo::Users::Stub.new('0.0.0.0:3000', :this_channel_is_insecure)
 
-  id = ARGV.size > 0 ? ARGV[0] : 1
+  id = ARGV.size > 0 ? ARGV[0] : nil
 
-  user = user_service.find(Demo::FindUserRequest.new(id: id.to_i))
-  puts "user #{user.id}, email: #{user.email}  name: #{user.name}"
+  if id
+    user = user_service.find(Demo::FindUserRequest.new(id: id.to_i))
+    puts "user #{user.id}, email: #{user.email}  name: #{user.name}"
+  else
+    response = user_service.all(Demo::AllUserRequest.new())
+    response.users.each do |user|
+      puts "user #{user.id}, email: #{user.email}  name: #{user.name}"
+    end
+  end
+  finish = Time.now
+  puts finish - start
 end
 
 main
